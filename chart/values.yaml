@@ -1,0 +1,10 @@
+app:
+  replicaCount: 1
+  image:
+    repository: cloud.canister.io:5000/skoba/health-checker
+    tag: latest
+    pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+

@@ -1,0 +1,28 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: "{{ include "chart.fullname" . }}-app-deployment"
+  labels:
+    app.kubernetes.io/name: "{{ include "chart.name" . }}-app"
+    helm.sh/chart: {{ include "chart.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.app.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: "{{ include "chart.name" . }}-app"
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: "{{ include "chart.name" . }}-app"
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: "{{ .Chart.Name }}-app"
+          image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
+          imagePullPolicy: {{ .Values.app.image.pullPolicy }}
+          command: ["ruby", "app.rb"]
+      imagePullSecrets:
+        - name: canister-regcred

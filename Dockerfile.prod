@@ -1,0 +1,20 @@
+FROM ruby:2.6.5-alpine as builder
+
+RUN apk add --update --upgrade gcc git build-base xz-dev curl linux-headers
+
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+COPY . .
+
+RUN bundle install
+
+FROM ruby:2.6.5-alpine
+
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+COPY --from=builder /usr/local/bundle /usr/local/bundle
+COPY --from=builder /usr/src/app /usr/src/app
+
+CMD ["ruby", "app.rb"]
