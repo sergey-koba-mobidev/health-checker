@@ -12,6 +12,7 @@ monitors:
   - name: My Blog
     url: https://1devblog.org
     period: "00:00:30"
+    retries: 0
     notifications:
       - name: Notify Telegram if Down
         state:

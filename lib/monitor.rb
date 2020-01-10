@@ -16,6 +16,8 @@ class Monitor
     dt = DateTime.parse(config['period'])
     @period = dt.hour * 3600 + dt.min * 60 + dt.sec
     @state = STATE_UP
+    @max_retries = config['retries']&.to_i || 0
+    @current_retries = 0
     Logger.log "New monitor registered #{@name} with period #{@period}"
   end
 
@@ -42,6 +44,13 @@ class Monitor
     @state = STATE_DOWN
     Logger.log "Failed to ping #{@url}"
   ensure
+    if @state == STATE_DOWN && @current_retries < @max_retries
+      @state = state_from
+      @current_retries += 1
+      Logger.log "Retrying #{@url} count #{@current_retries}"
+    else
+      @current_retries = 0
+    end
     Notification::Resolver.new(@notifications, state_from, @state).run
   end
 end
